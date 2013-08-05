@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="EGraphvizTool"
+            extensions="gv"
+            icon="icons/sample.gif"
+            contributorClass="egraphviztool.graphvizeditor.GraphvizEditorContributor"
+            class="egraphviztool.graphvizeditor.GraphvizEditor"
+            id="egraphviztool.graphvizeditor.GraphvizEditor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            name="EGraphvizTool Wizards"
+            id="EGraphvizTool">
+      </category>
+      <wizard
+            name="EGraphvizTool file"
+            icon="icons/sample.gif"
+            category="EGraphvizTool"
+            class="egraphviztool.wizards.EGraphvizToolNewWizard"
+            id="egraphviztool.wizards.EGraphvizToolNewWizard">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <wizard
+      		name="Graphviz To Image"
+      		icon="icons/sample.gif"
+      		class="egraphviztool.wizards.EGraphvizToolExportWizard"
+      		id="egraphbiztool.wizards.EGraphvizToolExportWizard">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="egraphviztool.preferences.EGraphvizToolPreferencesPage"
+            id="egraphviztool.preferences.EGraphvizToolPreferencesPage"
+            name="EGraphviz Tool">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="egraphviztool.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+   </extension>
+
+</plugin>
