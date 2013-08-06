@@ -6,8 +6,10 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -65,7 +67,8 @@ public class GraphvizEditor extends MultiPageEditorPart implements IResourceChan
 		try {
 			editor = new TextEditor();
 			int index = addPage(editor, getEditorInput());
-			setPageText(index, editor.getTitle());
+			setPartName(editor.getTitle());
+			setPageText(index, "Source");
 		} catch (PartInitException e) {
 			ErrorDialog.openError(
 				getSite().getShell(),
@@ -154,7 +157,7 @@ public class GraphvizEditor extends MultiPageEditorPart implements IResourceChan
 	public void doSaveAs() {
 		IEditorPart editor = getEditor(0);
 		editor.doSaveAs();
-		setPageText(0, editor.getTitle());
+		setPartName(editor.getTitle());
 		setInput(editor.getEditorInput());
 	}
 	
@@ -199,8 +202,13 @@ public class GraphvizEditor extends MultiPageEditorPart implements IResourceChan
 						image = graphvizWrapper.runGraphviz(canvas.getDisplay());
 						canvas.loadImage(image);
 					} catch (IOException | InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						MessageDialog.openError(getSite().getShell(),
+								"Error generating output",
+								e.getMessage());
+					} catch (CoreException e) {
+						ErrorDialog.openError(getSite().getShell(),
+								"Error generating output",
+								null, e.getStatus());
 					}
 				}
 			}
@@ -220,7 +228,7 @@ public class GraphvizEditor extends MultiPageEditorPart implements IResourceChan
 							pages[i].closeEditor(editorPart,true);
 						}
 					}
-				}            
+				}
 			});
 		}
 	}

@@ -7,9 +7,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
@@ -36,7 +40,8 @@ public class GraphvizWrapper implements IPropertyChangeListener {
 		return graphvizData_;
 	}
 	
-	public Image runGraphviz(Display display) throws IOException, InterruptedException {
+	public Image runGraphviz(Display display) throws IOException,
+			InterruptedException, CoreException {
 		Image image = null;
 		
 		Runtime runtime = Runtime.getRuntime();
@@ -47,7 +52,25 @@ public class GraphvizWrapper implements IPropertyChangeListener {
 		stdOutput.write(graphvizData_);
 		stdOutput.flush();
 		stdOutput.close();
-		image = new Image(display, stdInput);
+		
+		try {
+			image = new Image(display, stdInput);
+		} catch (SWTException e) {
+			StringBuilder builder = new StringBuilder();
+			String line = null;
+			while ((line = stdError.readLine()) != null) {
+				builder.append(line);
+				builder.append("\n");
+			}
+		
+			if (builder.toString().length() > 0) {
+				IStatus status = new Status(IStatus.ERROR, "EGraphvizTool",
+						builder.toString());
+				throw new CoreException(status);
+			}
+		}
+		
+		stdError.close();
 		proc.waitFor();
 		
 		return image;

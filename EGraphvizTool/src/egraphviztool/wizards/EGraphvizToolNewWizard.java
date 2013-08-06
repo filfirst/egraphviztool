@@ -128,9 +128,15 @@ public class EGraphvizToolNewWizard extends Wizard implements INewWizard {
 	 */
 
 	private InputStream openContentStream() {
-		String contents =
-			"This is the initial file contents for *.gv file that should be word-sorted in the Preview page of the multi-page editor";
-		return new ByteArrayInputStream(contents.getBytes());
+		StringBuilder builder = new StringBuilder();
+		builder.append("/*\nThis is the initial file contents for *.gv file that should be word-sorted \n")
+			.append("in the Preview page of the multi-page editor.\n\n")
+			.append("Following is a simple example.\n*/\n\n")
+			.append("digraph demo {\n")
+			.append("    a -> t;\n")
+			.append("}\n");
+		
+		return new ByteArrayInputStream(builder.toString().getBytes());
 	}
 
 	private void throwCoreException(String message) throws CoreException {
