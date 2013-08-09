@@ -1,7 +1,14 @@
 package egraphviztool.graphvizeditor;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.eclipse.jface.action.*;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -12,6 +19,10 @@ import org.eclipse.ui.ide.IDEActionFactory;
 import org.eclipse.ui.part.MultiPageEditorActionBarContributor;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
+import org.xml.sax.SAXException;
+
+import egraphviztool.Activator;
+import egraphviztool.utils.EGraphvizUtils;
 
 /**
  * Manages the installation/deinstallation of global actions for multi-page editors.
@@ -20,14 +31,18 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
  */
 public class GraphvizEditorContributor extends MultiPageEditorActionBarContributor {
 	private IEditorPart activeEditorPart;
-	private Action sampleAction;
+	private Action colorPickerAction;
+	private Map<String, RGB> colorMapping;
+
 	/**
 	 * Creates a multi-page contributor.
 	 */
 	public GraphvizEditorContributor() {
 		super();
+		colorMapping = null;
 		createActions();
 	}
+
 	/**
 	 * Returns the action registed with the given text editor.
 	 * @return IAction or null if editor is null.
@@ -80,24 +95,41 @@ public class GraphvizEditorContributor extends MultiPageEditorActionBarContribut
 			actionBars.updateActionBars();
 		}
 	}
+
 	private void createActions() {
-		sampleAction = new Action() {
+		createColorMapping();
+		colorPickerAction = new Action() {
 			public void run() {
-				MessageDialog.openInformation(null, "EGraphvizTool", "Sample Action Executed");
+				Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+				ColorPickerDialog dialog = new ColorPickerDialog(shell, colorMapping);
+				dialog.setEditor(activeEditorPart);
+				dialog.open();
 			}
 		};
-		sampleAction.setText("Sample Action");
-		sampleAction.setToolTipText("Sample Action tool tip");
-		sampleAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
+		colorPickerAction.setText("Pick up a color");
+		colorPickerAction.setToolTipText("Pick up a color");
+		colorPickerAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
 				getImageDescriptor(IDE.SharedImages.IMG_OBJS_TASK_TSK));
 	}
+
 	public void contributeToMenu(IMenuManager manager) {
 		IMenuManager menu = new MenuManager("Editor &Menu");
 		manager.prependToGroup(IWorkbenchActionConstants.MB_ADDITIONS, menu);
-		menu.add(sampleAction);
+		menu.add(colorPickerAction);
 	}
+
 	public void contributeToToolBar(IToolBarManager manager) {
 		manager.add(new Separator());
-		manager.add(sampleAction);
+		manager.add(colorPickerAction);
 	}
+
+	private void createColorMapping() {
+		try {
+			InputStream stream = Activator.getFileInputStream("res/colors.xml");
+			colorMapping = EGraphvizUtils.parseColors(stream);
+		} catch (IOException | SAXException | ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

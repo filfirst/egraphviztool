@@ -1,5 +1,10 @@
 package egraphviztool;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -57,5 +62,9 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+	
+	public static InputStream getFileInputStream(String path) throws IOException {
+		return FileLocator.openStream(plugin.getBundle(), new Path(path), false);
 	}
 }
